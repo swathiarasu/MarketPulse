@@ -1,7 +1,7 @@
 
 # MarketPulse: Real-Time Portfolio Risk Management Dashboard
 
-An interactive risk management dashboard built using **Streamlit** to help users — from beginners to professionals — visualize, analyze, and understand portfolio risk with real-time market data.
+An interactive risk management dashboard built using **Streamlit** to help users from beginners to professionals - visualize, analyze, and understand portfolio risk with real-time market data.
 
 ---
 

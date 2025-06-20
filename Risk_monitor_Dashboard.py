@@ -1,11 +1,15 @@
 import yfinance as yf
 import pandas as pd
+import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 def fetch_price_data(tickers, start, end):
     # Download full data, turn off auto-adjust to get 'Adj Close'
     raw_data = yf.download(tickers, start=start, end=end, group_by='ticker', auto_adjust=False)
 
-    # Try to extract Adjusted Close
+    # Extract Adjusted Close
     adj_close = pd.DataFrame()
     for ticker in tickers:
         try:
@@ -25,7 +29,7 @@ def fetch_price_data(tickers, start, end):
     
     return adj_close.dropna()
 
-# Example usage
+# Test usage
 tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'SPY']
 start_date = '2020-01-01'
 end_date = '2024-12-31'
@@ -34,11 +38,9 @@ price_df = fetch_price_data(tickers, start_date, end_date)
 print(price_df.head())
 
 
-
 # Fill missing values using forward fill
 cleaned_price_df = price_df.ffill().dropna()
 
-import numpy as np
 
 # Calculate daily log returns
 def calculate_log_returns(prices):
@@ -56,7 +58,7 @@ covariance_matrix = returns_df.cov()
 print("Correlation Matrix:\n", correlation_matrix)
 print("Covariance Matrix:\n", covariance_matrix)
 
-#####################################################################
+
 
 # Define your weights (must sum to 1)
 portfolio_weights = {
@@ -98,15 +100,12 @@ excess_returns = portfolio_returns - risk_free_rate_daily
 sharpe_ratio = (excess_returns.mean() / portfolio_returns.std()) * np.sqrt(252)
 print(f"Portfolio Sharpe Ratio: {sharpe_ratio:.2f}")
 
-import seaborn as sns
-import matplotlib.pyplot as plt
-
 plt.figure(figsize=(10, 6))
 sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f")
 plt.title("Asset Correlation Matrix")
 plt.show()
 
-#################################################################################
+
 confidence_level = 0.95
 holding_period = 1  # in days
 initial_investment = 1_000_000  # $1M portfolio
@@ -147,7 +146,6 @@ n_day = 5
 print(f"5-Day Parametric VaR (95%): ${param_var * np.sqrt(n_day):,.2f}")
 
 
-################################################################################
 
 
 # Define crisis windows
@@ -196,7 +194,7 @@ estimated_loss = simulate_custom_crash(portfolio_weights, tech_assets, -40, init
 
 print(f"\nHypothetical Tech Crash (-40%) Estimated Portfolio Loss: ${estimated_loss:,.2f}")
 
-############################################################################################
+
 risk_metrics = {
     'Volatility (Annualized)': f"{annual_volatility:.2%}",
     'Beta vs SPY': round(beta, 3),
@@ -212,8 +210,6 @@ for name, result in crisis_results.items():
     risk_metrics[f'{name} - Return (%)'] = result['Total Return (%)']
     risk_metrics[f'{name} - Value Lost ($)'] = result['Value Lost ($)']
 
-import pandas as pd
-
 # Convert to DataFrame with one row
 risk_df = pd.DataFrame([risk_metrics])
 risk_df.to_csv("Data/risk_dashboard_summary.csv", index=False)
@@ -225,9 +221,6 @@ print("Exported to risk_dashboard_summary.xlsx")
 risk_df.to_json("Data/risk_dashboard_summary.json", orient='records', lines=True)
 print("Exported to risk_dashboard_summary.json")
 
-###########################################################################
-
-import os
 
 os.makedirs("data", exist_ok=True)
 
@@ -237,7 +230,6 @@ portfolio_returns.to_csv("data/portfolio_daily_returns.csv", header=["Portfolio 
 # Export individual asset returns
 returns_df.to_csv("data/individual_asset_returns.csv")
 
-import matplotlib.pyplot as plt
 
 labels = list(crisis_results.keys()) + ["Hypothetical Tech Crash"]
 losses = [res['Value Lost ($)'] for res in crisis_results.values()] + [estimated_loss]
